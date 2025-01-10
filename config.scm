@@ -17,8 +17,18 @@
              ;; (gnu services qemu)
              (nongnu packages nvidia)
              (nongnu services nvidia))
-(use-service-modules cups desktop networking ssh xorg virtualization)
+
+(use-service-modules
+  cups
+  desktop
+  networking
+  ssh
+  xorg
+  virtualization)
+
 (use-package-modules
+  ssh
+  terminals
   spice)
 
 (operating-system
@@ -47,7 +57,9 @@
   ;;(packages (append (list (specification->package "nss-certs"))
   ;;                  %base-packages))
   (packages 
-   (cons* spice-vdagent
+   (cons* kitty
+	  openssh
+          spice-vdagent
           %base-packages))
 
   (kernel-arguments '("modprobe.blacklist=nouveau"
@@ -58,15 +70,14 @@
   ;; Below is the list of system services.  To search for available
   ;; services, run 'guix system search KEYWORD' in a terminal.
   (services
-   (append (list (service xfce-desktop-service-type)
-		 (service nvidia-service-type)
-		 (service qemu-guest-agent-service-type)
-                 (set-xorg-configuration
-                  (xorg-configuration (keyboard-layout keyboard-layout))))
+   (cons* (service xfce-desktop-service-type)
+	  (service nvidia-service-type)
+	  (service qemu-guest-agent-service-type)
+	  (service openssh-service-type)
+	  (set-xorg-configuration
+	    (xorg-configuration (keyboard-layout keyboard-layout)))
+	  %desktop-services))
 
-           ;; This is the default list of services we
-           ;; are appending to.
-           %desktop-services))
   (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
                 (targets (list "/boot/efi"))
