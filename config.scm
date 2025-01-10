@@ -17,7 +17,9 @@
              ;; (gnu services qemu)
              (nongnu packages nvidia)
              (nongnu services nvidia))
-(use-service-modules cups desktop networking ssh xorg)
+(use-service-modules cups desktop networking ssh xorg virtualization)
+(use-package-modules
+  spice)
 
 (operating-system
   (kernel linux)
@@ -44,7 +46,9 @@
   ;; for packages and 'guix install PACKAGE' to install a package.
   ;;(packages (append (list (specification->package "nss-certs"))
   ;;                  %base-packages))
-  (packages %base-packages)
+  (packages 
+   (cons* spice-vdagent
+          %base-packages))
 
   (kernel-arguments '("modprobe.blacklist=nouveau"
                       ;; Set this if the card is not used for displaying or
@@ -56,7 +60,7 @@
   (services
    (append (list (service xfce-desktop-service-type)
 		 (service nvidia-service-type)
-		 ;; (service qemu-guest-agent-service-type)
+		 (service qemu-guest-agent-service-type)
                  (set-xorg-configuration
                   (xorg-configuration (keyboard-layout keyboard-layout))))
 
