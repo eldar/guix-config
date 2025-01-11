@@ -22,11 +22,13 @@
   cups
   desktop
   networking
+  nix
   ssh
   xorg
   virtualization)
 
 (use-package-modules
+  package-management
   ssh
   terminals
   spice)
@@ -72,6 +74,7 @@
   (services
    (cons* (service xfce-desktop-service-type)
 	  (service nvidia-service-type)
+	  (service nix-service-type)
 	  (service qemu-guest-agent-service-type)
 	  (service openssh-service-type)
 	  (set-xorg-configuration
