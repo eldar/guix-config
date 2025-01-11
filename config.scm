@@ -76,7 +76,17 @@
 	  (service openssh-service-type)
 	  (set-xorg-configuration
 	    (xorg-configuration (keyboard-layout keyboard-layout)))
-	  %desktop-services))
+
+	  (modify-services %desktop-services
+             ;; Nonguix substitute services
+             (guix-service-type config => (guix-configuration
+               (inherit config)
+               (substitute-urls
+                (append (list "https://substitutes.nonguix.org")
+                  %default-substitute-urls))
+               (authorized-keys
+                (append (list (local-file "./substitutes.nonguix.org.pub"))
+                  %default-authorized-guix-keys)))))))
 
   (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
