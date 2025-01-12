@@ -29,6 +29,7 @@
 
 (use-package-modules
   package-management
+  gnome
   ssh
   terminals
   spice)
@@ -72,7 +73,7 @@
   ;; Below is the list of system services.  To search for available
   ;; services, run 'guix system search KEYWORD' in a terminal.
   (services
-   (cons* (service xfce-desktop-service-type)
+   (cons* (service gnome-desktop-service-type)
 	  (service nvidia-service-type)
 	  (service nix-service-type)
 	  (service qemu-guest-agent-service-type)
@@ -81,15 +82,19 @@
 	    (xorg-configuration (keyboard-layout keyboard-layout)))
 
 	  (modify-services %desktop-services
+	   (gdm-service-type config =>
+	     (gdm-configuration
+	      (inherit config)
+	      (wayland? #t)))
              ;; Nonguix substitute services
-             (guix-service-type config => (guix-configuration
-               (inherit config)
-               (substitute-urls
-                (append (list "https://substitutes.nonguix.org")
-                  %default-substitute-urls))
-               (authorized-keys
-                (append (list (local-file "./substitutes.nonguix.org.pub"))
-                  %default-authorized-guix-keys)))))))
+           (guix-service-type config => (guix-configuration
+             (inherit config)
+             (substitute-urls
+              (append (list "https://substitutes.nonguix.org")
+                %default-substitute-urls))
+             (authorized-keys
+              (append (list (local-file "./substitutes.nonguix.org.pub"))
+                %default-authorized-guix-keys)))))))
 
   (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
