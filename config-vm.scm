@@ -10,15 +10,13 @@
 ;; Indicate which modules to import to access the variables
 ;; used in this configuration.
 (use-modules (gnu))
-;; (use-modules (gnu packages))
-(use-modules (nongnu packages linux)
- 	     (nongnu system linux-initrd))
+(use-modules (nongnu packages linux))
+;; (use-modules (nongnu packages linux)
+;; 	     (nongnu system linux-initrd))
 (use-modules (gnu services xorg)
              ;; (gnu services qemu)
              (nongnu packages nvidia)
              (nongnu services nvidia))
-
-;; (use-modules (gnu packages version-control))
 
 (use-service-modules
   cups
@@ -30,40 +28,47 @@
   virtualization)
 
 (use-package-modules
-  version-control
   package-management
   gnome
   ssh
-  terminals)
+  terminals
+  spice)
 
 (operating-system
-  (kernel linux-lts)
-  (initrd microcode-initrd)
-  (firmware (list nvidia-firmware
-		  linux-firmware))
+  (kernel linux)
+  ;;(initrd microcode-initrd)
+  ;;(firmware (list linux-firmware))
+  (firmware (append (list nvidia-firmware)
+		    %base-firmware))
   (locale "en_GB.utf8")
   (timezone "Europe/London")
   (keyboard-layout (keyboard-layout "us"))
-  (host-name "mars")
+  (host-name "ganymede")
 
   ;; The list of user accounts ('root' is implicit).
   (users (cons* (user-account
                   (name "eldar")
-                  (comment "Eldar Insafutdinov")
+                  (comment "Eldar")
                   (group "users")
                   (home-directory "/home/eldar")
                   (supplementary-groups '("wheel" "netdev" "audio" "video")))
                 %base-user-accounts))
 
+  ;; Packages installed system-wide.  Users can also install packages
+  ;; under their own account: use 'guix search KEYWORD' to search
+  ;; for packages and 'guix install PACKAGE' to install a package.
+  ;;(packages (append (list (specification->package "nss-certs"))
+  ;;                  %base-packages))
+  (packages 
+   (cons* kitty
+	  openssh
+          spice-vdagent
+          %base-packages))
+
   (kernel-arguments '("modprobe.blacklist=nouveau"
                       ;; Set this if the card is not used for displaying or
                       ;; you're using Wayland:
                       "nvidia_drm.modeset=1"))
-
-  (packages 
-   (cons* git
-	  openssh
-          %base-packages))
 
   ;; Below is the list of system services.  To search for available
   ;; services, run 'guix system search KEYWORD' in a terminal.
@@ -71,7 +76,7 @@
    (cons* (service gnome-desktop-service-type)
 	  (service nvidia-service-type)
 	  (service nix-service-type)
-	  ;; (service qemu-guest-agent-service-type)
+	  (service qemu-guest-agent-service-type)
 	  (service openssh-service-type)
 	  (set-xorg-configuration
 	    (xorg-configuration (keyboard-layout keyboard-layout)))
@@ -95,11 +100,9 @@
                 (bootloader grub-efi-bootloader)
                 (targets (list "/boot/efi"))
                 (keyboard-layout keyboard-layout)))
-
-  ;; (swap-devices (list (swap-space
-  ;;                      (target (uuid
-  ;;                               "51775bbd-fa33-496a-a0fb-1f76da456126")))))
-
+  (swap-devices (list (swap-space
+                        (target (uuid
+                                 "51775bbd-fa33-496a-a0fb-1f76da456126")))))
 
   ;; The list of file systems that get "mounted".  The unique
   ;; file system identifiers there ("UUIDs") can be obtained
@@ -107,17 +110,17 @@
   (file-systems (cons* (file-system
                          (mount-point "/home")
                          (device (uuid
-                                  "a2bf19c0-ca15-46a9-9f97-c82de90fb6ca"
+                                  "06e46b55-809c-4f3a-b765-29cf05e94aea"
                                   'ext4))
                          (type "ext4"))
                        (file-system
                          (mount-point "/")
                          (device (uuid
-                                  "7b79fb22-d509-404b-942d-05934bac7302"
+                                  "0f0464ba-ff65-4483-8ded-21243ecfc5c3"
                                   'ext4))
                          (type "ext4"))
                        (file-system
                          (mount-point "/boot/efi")
-                         (device (uuid "7DD1-4EDE"
+                         (device (uuid "6D53-72AF"
                                        'fat32))
                          (type "vfat")) %base-file-systems)))
