@@ -36,3 +36,5 @@ $ guix package --list-profiles
 ```
 ferocious_iguana: that signifies a disk corruption. Try "guix gc --verify="contents,repair"". It will at least tell you what paths are broken, and possibly repair them. For the ones it won't be able to repair, you will want to remove those paths - with "guix gc -D", you might have to also delete other paths referring to them
 ```
+
+https://paste.debian.net/1346115/
